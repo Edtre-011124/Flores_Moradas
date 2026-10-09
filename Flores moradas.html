@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Para Vos 💜 - Flores Moradas & Regalo Especial</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tipografías de Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #090514;
+      --purple-light: #e9d5ff;
+      --purple-medium: #c084fc;
+      --purple-main: #a855f7;
+      --purple-dark: #581c87;
+      --gold: #fbbf24;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      font-family: 'Inter', sans-serif;
+      color: #f3e8ff;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+
+    .font-romantic { font-family: 'Dancing Script', cursive; }
+    .font-serif-title { font-family: 'Playfair Display', serif; }
+
+    /* Fondo degradado suave */
+    .bg-romantic {
+      background: radial-gradient(circle at 50% 35%, #2e1065 0%, #090514 75%);
+    }
+
+    /* Cristal helado (Glassmorphism) */
+    .glass-card {
+      background: rgba(22, 13, 36, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(107, 33, 168, 0.6),
+                  0 0 20px rgba(168, 85, 247, 0.2);
+    }
+
+    /* Animación de error */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+    .animate-shake { animation: shake 0.4s ease-in-out; }
+
+    /* Animación de pulso para la flor del centro */
+    @keyframes flowerPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
+      50% { transform: scale(1.12); filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.9)); }
+    }
+
+    .center-flower-interactive {
+      animation: flowerPulse 2s infinite ease-in-out;
+      cursor: pointer;
+      transform-origin: 150px 170px;
+    }
+
+    /* Partículas de pétalos cayendo */
+    .petal-particle {
+      position: absolute;
+      background: linear-gradient(135deg, #d8b4fe, #9333ea);
+      border-radius: 12px 0 12px 0;
+      opacity: 0.75;
+      pointer-events: none;
+      animation: fall 9s linear infinite, sway 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes fall {
+      0% { top: -10%; }
+      100% { top: 110%; }
+    }
+
+    @keyframes sway {
+      0% { transform: translateX(0) rotate(0deg); }
+      100% { transform: translateX(40px) rotate(360deg); }
+    }
+
+    .letter-slide-up {
+      animation: openLetterAnimation 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes openLetterAnimation {
+      0% {
+        opacity: 0;
+        transform: translateY(60px) scale(0.85);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-backdrop {
+      background: rgba(5, 2, 12, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 10, 25, 0.4);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(168, 85, 247, 0.5);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body class="bg-romantic min-h-screen flex flex-col justify-between items-center relative overflow-x-hidden antialiased selection:bg-purple-500 selection:text-white">
+
+  <!-- Contenedor para lluvia de pétalos -->
+  <div id="petals-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+  <!-- Botón de Audio Flotante -->
+  <header class="w-full max-w-lg px-4 pt-4 z-40 flex justify-end">
+    <button id="musicToggleBtn" onclick="toggleAudio()" class="glass-card text-purple-200 active:scale-95 text-xs font-medium px-3.5 py-2 rounded-full flex items-center gap-2 transition duration-300 border border-purple-500/40 shadow-lg">
+      <i id="musicIcon" class="fas fa-music text-purple-400"></i>
+      <span id="musicText">Música: Off</span>
+    </button>
+  </header>
+
+  <!-- PANTALLA DE CONTENIDO PRINCIPAL -->
+  <main class="w-full max-w-md px-4 py-2 flex-1 flex flex-col justify-center items-center z-10 my-auto">
+
+    <!-- 1. PANTALLA DE BLOQUEO (26/09/2026) -->
+    <section id="lockScreen" class="w-full glass-card p-6 md:p-8 rounded-3xl text-center space-y-6 transition-all duration-500 shadow-2xl">
+      
+      <div class="space-y-2">
+        <div class="inline-flex justify-center items-center w-16 h-16 rounded-full bg-purple-950/70 border border-purple-400/30 text-purple-300 text-2xl mb-1 shadow-inner">
+          <i class="fas fa-lock text-purple-400 animate-pulse"></i>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-serif-title font-semibold text-purple-100">
+          Un Detalle Especial 💜
+        </h1>
+        <p class="text-xs md:text-sm text-purple-300/80 leading-relaxed px-2">
+          Para ver tu sorpresa, ingresá la fecha en la que empezamos a hablar por primera vez:
+        </p>
+      </div>
+
+      <!-- Selector / Campo de Entrada de Fecha -->
+      <form id="dateForm" onsubmit="unlockGift(event)" class="space-y-4">
+        
+        <div class="relative max-w-xs mx-auto">
+          <input 
+            type="text" 
+            id="dateInput" 
+            placeholder="DIA-MES-AÑO"
+            class="w-full px-4 py-3.5 rounded-2xl bg-purple-950/50 border border-purple-500/50 text-center text-xl font-semibold tracking-wider text-purple-100 placeholder-purple-400/40 focus:outline-none focus:border-purple-300 focus:ring-2 focus:ring-purple-500/40 transition-all duration-300"
+            autocomplete="off"
+            inputmode="numeric"
+          />
+          <i class="fas fa-calendar-heart absolute right-4 top-1/2 -translate-y-1/2 text-purple-400/70 text-lg"></i>
+        </div>
+
+        <!-- Mensaje de error -->
+        <p id="errorMessage" class="text-xs text-rose-300 hidden font-medium flex items-center justify-center gap-1.5 animate-fadeIn">
+          <i class="fas fa-heart-crack text-rose-400"></i>
+          <span>Esa no es la fecha especial... Intenta de nuevo ❤️</span>
+        </p>
+
+        <button 
+          type="submit" 
+          class="w-full max-w-xs mx-auto py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-fuchsia-600 active:scale-95 text-white font-semibold text-sm shadow-lg shadow-purple-900/50 hover:shadow-purple-600/50 transition duration-300 flex items-center justify-center gap-2"
+        >
+          <span>Desbloquear Flores</span>
+          <i class="fas fa-key text-xs"></i>
+        </button>
+
+      </form>
+
+      <p class="text-[11px] text-purple-400/60 italic">
+        Pista: Septiembre
+      </p>
+    </section>
+
+    <!-- 2. ESCENA PRINCIPAL: RAMO DE FLORES MORADAS INTERACTIVO -->
+    <section id="giftScreen" class="w-full hidden space-y-4 text-center transition-all duration-700 opacity-0 transform translate-y-4">
+      
+      <div class="space-y-1">
+        <span class="inline-block px-3 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-[11px] font-medium tracking-widest text-purple-300 uppercase">
+          26 de Septiembre de 2026
+        </span>
+        <h2 class="text-3xl md:text-4xl font-romantic text-purple-100 drop-shadow-md">
+          Flores Moradas Para Vos
+        </h2>
+      </div>
+
+      <!-- Indicador animado -->
+      <div id="touchPrompt" class="inline-flex items-center gap-2 bg-purple-900/60 border border-amber-400/50 px-4 py-1.5 rounded-full text-amber-200 text-xs font-medium animate-bounce shadow-lg shadow-amber-500/10">
+        <i class="fas fa-hand-pointer text-amber-300 text-sm"></i>
+        <span>¡Toca la flor del centro para abrir la carta!</span>
+      </div>
+
+      <!-- RAMO SVG PERFECTAMENTE CENTRADO -->
+      <div class="relative w-full max-w-[280px] sm:max-w-xs mx-auto py-2 flex justify-center items-center">
+        
+        <div class="absolute w-44 h-44 bg-purple-600/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
+
+        <svg viewBox="0 0 300 360" class="w-full h-auto drop-shadow-[0_12px_24px_rgba(168,85,247,0.35)] overflow-visible">
+          <defs>
+            <linearGradient id="petalGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f3e8ff"/>
+              <stop offset="40%" stop-color="#c084fc"/>
+              <stop offset="100%" stop-color="#6b21a8"/>
+            </linearGradient>
+
+            <linearGradient id="petalGradCenter" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="40%" stop-color="#e9d5ff"/>
+              <stop offset="100%" stop-color="#891cce"/>
+            </linearGradient>
+
+            <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4ade80"/>
+              <stop offset="100%" stop-color="#15803d"/>
+            </linearGradient>
+
+            <radialGradient id="centerGoldGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="70%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#b45309"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Envoltorio del ramo -->
+          <path d="M 105 235 Q 150 260 195 235 L 175 330 Q 150 340 125 330 Z" fill="rgba(216, 180, 254, 0.12)" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4 2"/>
+          
+          <!-- Tallos -->
+          <path d="M 150 170 L 150 315" stroke="url(#stemGrad)" stroke-width="5" stroke-linecap="round" />
+          <path d="M 115 100 Q 130 210 148 305" stroke="url(#stemGrad)" stroke-width="4" stroke-linecap="round" />
+          <path d="M 185 100 Q 170 210 152 305" stroke="url(#stemGrad)" stroke-width="4" stroke-linecap="round" />
+          <path d="M 85 160 Q 115 220 148 300" stroke="url(#stemGrad)" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M 215 160 Q 185 220 152 300" stroke="url(#stemGrad)" stroke-width="3.5" stroke-linecap="round" />
+
+          <!-- Hojitas -->
+          <path d="M 120 215 C 95 205 85 225 110 230 Z" fill="#22c55e" opacity="0.85"/>
+          <path d="M 180 220 C 205 210 215 230 190 235 Z" fill="#16a34a" opacity="0.85"/>
+
+          <!-- Cinta / Lazito -->
+          <path d="M 132 270 Q 150 280 168 270 Q 150 260 132 270" fill="#c084fc" />
+          <circle cx="150" cy="270" r="5" fill="#f472b6"/>
+          <path d="M 150 270 Q 140 295 128 315 M 150 270 Q 160 295 172 315" stroke="#c084fc" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- FLOR 1: ARRIBA IZQUIERDA -->
+          <g transform="translate(115, 100) scale(0.75)">
+            <circle cx="0" cy="-20" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="0" cy="0" r="9" fill="url(#centerGoldGlow)"/>
+          </g>
+
+          <!-- FLOR 2: ARRIBA DERECHA -->
+          <g transform="translate(185, 100) scale(0.75)">
+            <circle cx="0" cy="-20" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="0" cy="0" r="9" fill="url(#centerGoldGlow)"/>
+          </g>
+
+          <!-- FLOR 3: LATERAL IZQUIERDA -->
+          <g transform="translate(85, 160) scale(0.75)">
+            <circle cx="0" cy="-20" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="0" cy="0" r="9" fill="url(#centerGoldGlow)"/>
+          </g>
+
+          <!-- FLOR 4: LATERAL DERECHA -->
+          <g transform="translate(215, 160) scale(0.75)">
+            <circle cx="0" cy="-20" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-12" cy="16" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="-19" cy="-6" r="15" fill="url(#petalGrad1)"/>
+            <circle cx="0" cy="0" r="9" fill="url(#centerGoldGlow)"/>
+          </g>
+
+          <!-- FLOR CENTRAL PRINCIPAL INTERACTIVA (EXACTAMENTE EN EL CENTRO DEL RAMO: 150, 170) -->
+          <g onclick="openLetterModal()" class="center-flower-interactive">
+            <circle cx="150" cy="170" r="30" fill="#a855f7" opacity="0.3" class="animate-ping" />
+            
+            <!-- Pétalos centrales -->
+            <circle cx="150" cy="148" r="17" fill="url(#petalGradCenter)"/>
+            <circle cx="171" cy="163" r="17" fill="url(#petalGradCenter)"/>
+            <circle cx="163" cy="188" r="17" fill="url(#petalGradCenter)"/>
+            <circle cx="137" cy="188" r="17" fill="url(#petalGradCenter)"/>
+            <circle cx="129" cy="163" r="17" fill="url(#petalGradCenter)"/>
+            
+            <!-- Centro Dorado -->
+            <circle cx="150" cy="170" r="11" fill="url(#centerGoldGlow)" stroke="#fef08a" stroke-width="1.5"/>
+            <circle cx="150" cy="170" r="4" fill="#ffffff" opacity="0.7"/>
+            
+            <!-- Icono Corazón -->
+            <path d="M 150 168 C 148 165 145 167 145 170 C 145 173 150 175 150 176 C 150 175 155 173 155 170 C 155 167 152 165 150 168 Z" fill="#7e22ce" />
+          </g>
+
+        </svg>
+
+      </div>
+
+      <p class="text-xs text-purple-300/70 italic px-4">
+        "Cada flor morada lleva una razón por la que quiero estar bien con vos..."
+      </p>
+
+    </section>
+
+  </main>
+
+  <!-- 3. MODAL DE CARTA Y SOBRE DESPLEGABLE -->
+  <div id="letterModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4 transition-opacity duration-500 opacity-0">
+    
+    <div class="w-full max-w-md my-auto relative">
+      
+      <button 
+        onclick="closeLetterModal()" 
+        class="absolute -top-12 right-0 w-10 h-10 rounded-full bg-purple-950/80 border border-purple-400/40 text-purple-200 flex items-center justify-center active:scale-90 transition duration-200 shadow-lg z-20"
+        aria-label="Cerrar carta"
+      >
+        <i class="fas fa-xmark text-lg"></i>
+      </button>
+
+      <!-- TARJETA CARTA DESPLEGABLE -->
+      <div id="cardContent" class="glass-card rounded-3xl p-6 md:p-8 space-y-4 border border-purple-400/40 shadow-2xl relative overflow-hidden letter-slide-up">
+        
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="flex justify-between items-center border-b border-purple-500/30 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-purple-400 animate-ping"></span>
+            <h3 class="font-romantic text-2xl md:text-3xl text-purple-100">Perdón de todo corazón</h3>
+          </div>
+        </div>
+
+        <!-- Mensaje de Disculpa -->
+        <div class="space-y-4 text-xs sm:text-sm md:text-base text-purple-100/90 leading-relaxed max-h-[60vh] overflow-y-auto pr-1.5 custom-scroll">
+          <p>
+           Desde el primer dia que empezamos a hablar mi vida es mucho más colorida gracias a vos. Por que en el lienzo de mis sueños, tu imagen se dibuja, y en el susurru del viento, tu nombre se escucha. 💜
+          </p>
+          <p>
+            Soy consiente que esto no es mucho y que tampoco son naturales, pero me gustaria darte estas flores moradas virtuales como un símbolo de lo mucho que me importás, de mi compromiso por hacer las cosas bien y de lo especial que sos en mi vida.
+          </p>
+          <p>
+            No prometo no lastimarte, por mis acciones o por mis malas decisiones, pero prometo buscar una solucion a cada una de ellas y que tu me ayudes en ellas para no hacer las cosas mal, y no hacerte pensar que no me importas por que eres una de las personas que mas quiero en mi vida. 💜
+          </p>
+          <p>
+            Gracias por tu paciencia y por escucharme. ¿Me perdonás?
+          </p>
+        </div>
+
+        <div class="pt-2 text-right border-t border-purple-500/30 flex justify-between items-center">
+          <span class="text-[11px] text-purple-400/70 italic">Toca fuera o la X para cerrar</span>
+          <p class="font-romantic text-xl text-purple-200">Con todo mi amor 💜</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="w-full text-center py-3 text-[11px] text-purple-400/50 z-10">
+    Pensado para vos con mucho cariño y amor 💜
+  </footer>
+
+  <script>
+    /* 1. SISTEMA DE AUDIO */
+    let audioCtx = null;
+    let isPlayingAudio = false;
+    let synthInterval = null;
+
+    function initAudioSynth() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    const notes = [220, 261.63, 293.66, 329.63, 392.00, 440, 523.25, 587.33];
+
+    function playSoftNote() {
+      if (!isPlayingAudio || !audioCtx) return;
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      const note = notes[Math.floor(Math.random() * notes.length)];
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(note, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.2);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 3.3);
+    }
+
+    function toggleAudio() {
+      initAudioSynth();
+      
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const btnText = document.getElementById('musicText');
+      const btnIcon = document.getElementById('musicIcon');
+
+      if (isPlayingAudio) {
+        isPlayingAudio = false;
+        clearInterval(synthInterval);
+        btnText.innerText = "Música: Off";
+        btnIcon.className = "fas fa-music text-purple-400";
+      } else {
+        isPlayingAudio = true;
+        btnText.innerText = "Música: On 🎵";
+        btnIcon.className = "fas fa-volume-high text-purple-300 animate-pulse";
+        
+        playSoftNote();
+        synthInterval = setInterval(playSoftNote, 1700);
+      }
+    }
+
+    /* 2. VALIDACIÓN DE FECHA */
+    const VALID_DATES = [
+      "26/09/2026", "26-09-2026", "26.09.2026", "26 09 2026",
+      "26/9/2026", "26-9-2026"
+    ];
+
+    function unlockGift(e) {
+      e.preventDefault();
+      const input = document.getElementById('dateInput');
+      const errorMsg = document.getElementById('errorMessage');
+      const lockCard = document.getElementById('lockScreen');
+      const giftCard = document.getElementById('giftScreen');
+
+      const userValue = input.value.trim().toLowerCase();
+
+      if (VALID_DATES.includes(userValue)) {
+        errorMsg.classList.add('hidden');
+        
+        if (!isPlayingAudio) {
+          toggleAudio();
+        }
+
+        lockCard.style.opacity = '0';
+        lockCard.style.transform = 'scale(0.92)';
+
+        setTimeout(() => {
+          lockCard.classList.add('hidden');
+          
+          giftCard.classList.remove('hidden');
+          setTimeout(() => {
+            giftCard.style.opacity = '1';
+            giftCard.style.transform = 'translateY(0)';
+          }, 50);
+          
+          createPetalExplosion();
+        }, 450);
+
+      } else {
+        errorMsg.classList.remove('hidden');
+        input.classList.add('border-rose-500', 'animate-shake');
+        
+        setTimeout(() => {
+          input.classList.remove('animate-shake');
+        }, 400);
+      }
+    }
+
+    /* 3. MODAL Y CARTA */
+    function openLetterModal() {
+      const modal = document.getElementById('letterModal');
+      const touchPrompt = document.getElementById('touchPrompt');
+
+      if (touchPrompt) touchPrompt.style.display = 'none';
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 20);
+
+      createPetalExplosion();
+    }
+
+    function closeLetterModal() {
+      const modal = document.getElementById('letterModal');
+      modal.classList.add('opacity-0');
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 500);
+    }
+
+    document.getElementById('letterModal').addEventListener('click', (e) => {
+      if (e.target.id === 'letterModal') {
+        closeLetterModal();
+      }
+    });
+
+    /* 4. PÉTALOS FLOTANTES */
+    function createPetals() {
+      const container = document.getElementById('petals-container');
+      const petalCount = 16;
+
+      for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal-particle';
+        
+        const size = Math.random() * 10 + 8;
+        petal.style.width = `${size}px`;
+        petal.style.height = `${size * 1.3}px`;
+        
+        petal.style.left = `${Math.random() * 100}%`;
+        petal.style.animationDuration = `${Math.random() * 6 + 6}s, ${Math.random() * 3 + 2}s`;
+        petal.style.animationDelay = `${Math.random() * 8}s, ${Math.random() * 2}s`;
+        petal.style.opacity = Math.random() * 0.6 + 0.3;
+
+        container.appendChild(petal);
+      }
+    }
+
+    function createPetalExplosion() {
+      const container = document.getElementById('petals-container');
+      for (let i = 0; i < 20; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal-particle';
+        
+        const size = Math.random() * 12 + 10;
+        petal.style.width = `${size}px`;
+        petal.style.height = `${size * 1.3}px`;
+        petal.style.left = `${Math.random() * 100}%`;
+        petal.style.top = `-5%`;
+        petal.style.animationDuration = `${Math.random() * 4 + 3}s, ${Math.random() * 2 + 1}s`;
+        
+        container.appendChild(petal);
+
+        setTimeout(() => {
+          petal.remove();
+        }, 6500);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      createPetals();
+    });
+  </script>
+</body>
+</html>
